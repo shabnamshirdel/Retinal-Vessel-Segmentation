@@ -31,9 +31,9 @@ def image2patch(image_path,patch_num,patch_size,patch_threshold,train_patch_dir,
     sample_count=0
     sample_index=0
   
-    sample_point=np.where(groundtruth==1)     # generate sample point (生成采样中心点)
+    sample_point=np.where(groundtruth==1)     # generate sample point 
 
-    state = np.random.get_state()      # shuffle the coord (打乱顺序，模拟随机采样)
+    state = np.random.get_state()      # shuffle the coord 
     np.random.shuffle(sample_point[0])
     np.random.set_state(state)
     np.random.shuffle(sample_point[1])
@@ -48,7 +48,7 @@ def image2patch(image_path,patch_num,patch_size,patch_threshold,train_patch_dir,
        
                 patch_image_binary=image[x-patch_size//2:x+patch_size//2,y-patch_size//2:y+patch_size//2,:]   # patch image
                 patch_groundtruth=groundtruth[x-patch_size//2:x+patch_size//2,y-patch_size//2:y+patch_size//2]       # patch mask
-                #patch_image_binary=np.asarray(0.25*patch_image[:,:,2]+0.75*patch_image[:,:,1])         # B*0.25+G*0.75, which enhance the vessel (增强血管的对比度)
+                #patch_image_binary=np.asarray(0.25*patch_image[:,:,2]+0.75*patch_image[:,:,1])         # B*0.25+G*0.75, which enhance the vessel 
                 patch_groundtruth=np.where(patch_groundtruth>0,255,0)
     
                 #patch_image_binary =cv2.equalizeHist((patch_image_binary*255.0).astype(np.uint8))/255.0
@@ -60,13 +60,13 @@ def image2patch(image_path,patch_num,patch_size,patch_threshold,train_patch_dir,
                 cv2.rectangle(groundtruth_show, (y-patch_size//2,x-patch_size//2,), (y+patch_size//2,x+patch_size//2), (0,1,0), 2)
             sample_count+=1
     
-        if show:                                 # visualize the sample process(可视化采样过程，会很慢！)
+        if show:                                 # visualize the sample process
             plt.figure(figsize=(15,15))
             plt.title("processing: %s"%image_name)
             plt.subplot(121)
             plt.imshow(image_show,cmap=plt.cm.gray)   # processd image
             plt.subplot(122)
-            plt.imshow(groundtruth_show,cmap=plt.cm.gray)  #groundtruth of the image, patch is showed as the green square (绿色的方框表示采样的图像块)
+            plt.imshow(groundtruth_show,cmap=plt.cm.gray)  #groundtruth of the image, patch is showed as the green square 
             plt.show()
         sample_index+=1
     plt.ioff()
