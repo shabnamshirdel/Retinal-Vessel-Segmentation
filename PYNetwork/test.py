@@ -24,24 +24,24 @@ ckpts.restore(tf.train.latest_checkpoint(train_cfg["checkpoint_dir"])).expect_pa
 def test_function(image_path,test_mask_dir,test_save_dir):
     image_name = image_path.split("/")[-1].split("_")[0]
 
-    # load and process test images （加载并预处理图像）
+    # load and process test images 
     image = plt.imread(image_path)
     original_shape = image.shape
     mask = plt.imread(test_mask_dir + image_name + "_test_mask.gif")
     mask = np.where(mask > 0, 1, 0)
 
-    # image to patches （图像分块）
+    # image to patches 
     image, pad_mask = padding_images(image, mask,test_cfg["stride"])
     image = preprocess(image, pad_mask)
     test_patch_list = img2patch_list(image,test_cfg["stride"])
 
-    # test dataloader （整合测试数据）
+    # test dataloader 
     test_dataset = tf.data.Dataset.from_tensor_slices(test_patch_list)
     test_dataset = test_dataset.map(load_test_data)
     test_dataset = test_dataset.batch(64)
     pred_result = []
 
-    # test process （测试）
+    # test process 
     print("testing image:", int(image_name))
     for batch, patch in enumerate(test_dataset):
         _, pred = testmodel(patch, training=False)
@@ -50,19 +50,19 @@ def test_function(image_path,test_mask_dir,test_save_dir):
         pred_result.append(pred)
     pred_result = np.concatenate(pred_result, axis=0)
 
-    # patches to image （还原图像）
+    # patches to image 
     #print("post processing:", image_name)
     pred_image = patchlist2image(pred_result, test_cfg["stride"],image.shape)
 
     pred_image = pred_image[:original_shape[0], :original_shape[1]]
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))  # 定义结构元素的形状和大小
-    mask = cv2.erode(mask.astype(np.uint8), kernel)  # 膨胀操作
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))  
+    mask = cv2.erode(mask.astype(np.uint8), kernel)  
 
     pred_image = pred_image * mask
     pred_image = np.where(pred_image > test_cfg["threshold"], 1, 0)
 
-    # visualize the test result （可视化测试结果）
+    # visualize the test result 
     plt.figure(figsize=(8, 8))
     plt.title(image_name + "-(" + str(image.shape[0]) + "," + str(image.shape[1]) + ")")
     plt.imshow(pred_image, cmap=plt.cm.gray)
