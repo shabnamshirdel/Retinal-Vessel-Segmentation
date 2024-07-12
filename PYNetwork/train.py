@@ -23,14 +23,14 @@ if not os.path.exists(log_dir):
 
 model=Unet(sample_cfg["patch_size"])
 
-# Learning rate and optimizer （学习率调整和优化器）
+# Learning rate and optimizer 
 cosine_decay = tf.keras.experimental.CosineDecayRestarts(initial_learning_rate=train_cfg["init_lr"], first_decay_steps=12000,t_mul=1000,m_mul=0.5,alpha=1e-5)
 optimizer=tf.keras.optimizers.Adam(learning_rate=cosine_decay)
 
-# loss function （损失函数）
+# loss function 
 #loss=tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
-# metric record （性能指标记录器）
+# metric record 
 train_loss = tf.keras.metrics.Mean(name='train_loss')
 train_acc=tf.keras.metrics.Mean(name='train_acc')
 current_accuracy = tf.keras.metrics.BinaryAccuracy(name='train_accuracy')
@@ -39,11 +39,11 @@ val_loss = tf.keras.metrics.Mean(name='val_loss')
 val_acc=tf.keras.metrics.Mean(name='val_acc')
 val_accuracy = tf.keras.metrics.BinaryAccuracy(name='val_accuracy')
 
-# checkpoint （模型存档管理器）
+# checkpoint 
 ckpt = tf.train.Checkpoint(model=model)
 #ckpt.restore(tf.train.latest_checkpoint(checkpoint_path))
 
-# tensorboard writer （Tensorboard记录器）
+# tensorboard writer （Tensorboard）
 log_dir=log_dir+ datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 log_writer = tf.summary.create_file_writer(log_dir)
 
@@ -53,12 +53,12 @@ def train_step(step, patch, groundtruth):
         linear, pred_seg = model(patch, training=True)
         losses = dice_loss(groundtruth, pred_seg)
 
-    # calculate the gradient （求梯度）
+    # calculate the gradient 
     grads = tape.gradient(losses, model.trainable_variables)
-    # bp (反向传播)
+    # bp 
     optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
-    # record the training loss and accuracy (记录loss和准确率)
+    # record the training loss and accuracy
     train_loss.update_state(losses)
     train_acc.update_state(dice(groundtruth, pred_seg))
 
@@ -67,7 +67,7 @@ def val_step(step, patch, groundtruth):
     linear, pred_seg = model(patch, training=False)
     losses = dice_loss(groundtruth, pred_seg)
 
-    # record the val loss and accuracy (记录loss和准确率)
+    # record the val loss and accuracy (loss)
     val_loss.update_state(losses)
     val_acc.update_state(dice(groundtruth, pred_seg))
 
@@ -85,13 +85,13 @@ def train_function(train_dataset,val_dataset):
 
     with log_writer.as_default():
         for epoch in range(EPOCHS):
-            # renew the recorder （重置记录项）
+            # renew the recorder 
             train_loss.reset_states()
             train_acc.reset_states()
             val_loss.reset_states()
             val_acc.reset_states()
 
-            # training （训练部分）
+            # training 
             for tstep, (patch, groundtruth) in enumerate(train_dataset):
                 train_step(lr_step, patch, groundtruth)
 
@@ -100,7 +100,7 @@ def train_function(train_dataset,val_dataset):
                 lr_step += 1
 
             if (epoch + 1) % VAL_TIME == 0:
-                # valid (验证部分)
+                # valid 
                 for vstep, (patch, groundtruth) in enumerate(val_dataset):
                     val_step(lr_step, patch, groundtruth)
 
