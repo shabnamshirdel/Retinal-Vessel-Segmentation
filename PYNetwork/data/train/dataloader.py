@@ -26,7 +26,7 @@ def load_image_groundtruth(img_path, groundtruth_path):
     groundtruth = tf.io.read_file(groundtruth_path)
     groundtruth = tf.image.decode_jpeg(groundtruth, channels=1)
 
-    # data argument (数据增强部分)
+    # data argument 
     if random.uniform(0, 1) >= 0.5:
         img = tf.image.flip_left_right(img)
         groundtruth = tf.image.flip_left_right(groundtruth)
@@ -49,7 +49,7 @@ def load_image_groundtruth(img_path, groundtruth_path):
 
 def get_dataset(dataset_cfg,regenerate=True):
     ## load configs
-    dataset_path = dataset_cfg["dataset_path"]  # modify the dataset_path to your own dir（将dataset_path修改至你自己的路径）
+    dataset_path = dataset_cfg["dataset_path"]  # modify the dataset_path to your own dir（dataset_path）
     train_dir = dataset_path + dataset_cfg["train_dir"]
     train_image_dir = train_dir + dataset_cfg["train_image_dir"]
     train_mask_dir = train_dir + dataset_cfg["train_mask_dir"]
@@ -69,7 +69,7 @@ def get_dataset(dataset_cfg,regenerate=True):
     if not os.path.exists(train_patch_dir):
         os.mkdir(train_patch_dir)
     
-    # generate patch images (生成图像块数据)
+    # generate patch images 
     if regenerate:
         shutil.rmtree(train_patch_dir)
         os.mkdir(train_patch_dir)
@@ -86,7 +86,7 @@ def get_dataset(dataset_cfg,regenerate=True):
     train_patch_groundtruth_path_list = sorted(glob(train_patch_dir + "*-*-groundtruth.jpg"))
     train_patch_img_path_list, train_patch_groundtruth_path_list = shuffle(train_patch_img_path_list,train_patch_groundtruth_path_list,random_state=0)
 
-    # make sure that img-list and mask-list is in order (确保打乱后的image-mask还是对应的)
+    # make sure that img-list and mask-list is in order (image-mask)
     # print(len(train_patch_img_path_list), len(train_patch_groundtruth_path_list))
     # print(train_patch_img_path_list[:2])
     # print(train_patch_groundtruth_path_list[:2])
