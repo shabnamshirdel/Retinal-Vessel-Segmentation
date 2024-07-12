@@ -20,7 +20,7 @@ def padding_images(image, mask,stride):
     return pad_image, pad_mask
 
 
-# images to patches （将图像分块）
+# images to patches 
 def img2patch_list(image ,stride):
     patch_list = []
     # image_binary=0.8*image[:,:,1:2]+0.2*image[:,:,2:3]
@@ -31,7 +31,7 @@ def img2patch_list(image ,stride):
     return patch_list
 
 
-# patches to image （将图像块拼成图像）
+# patches to image 
 def patchlist2image(patch_list, stride, image_shape):
     result = np.zeros(image_shape[:2])
     sum_matrix = np.zeros(image_shape[:2])
